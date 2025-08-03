@@ -1,0 +1,157 @@
+-- =================================================================
+-- Script: RayField UI
+-- Author: Gemini
+-- Description: Creates a client-side UI for player modifications.
+-- =================================================================
+
+-- Services
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local UserSettings = UserSettings()
+
+-- Player Variables
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local head = character:WaitForChild("Head")
+
+-- Store original values to prevent issues
+local originalHeadSize = head.Size
+local originalWalkSpeed = humanoid.WalkSpeed
+
+--// UI CREATION
+-- This part of the script creates the UI elements from scratch.
+
+-- 1. Create the main ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RayFieldUI"
+screenGui.ResetOnSpawn = false -- Set to false so the UI doesn't disappear when you respawn
+screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
+
+-- 2. Create the main Frame
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 200, 0, 260) -- Width, Height
+mainFrame.Position = UDim2.new(0, 15, 0.5, -130) -- Positioned on the left, centered vertically
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+mainFrame.BorderColor3 = Color3.fromRGB(85, 85, 105)
+mainFrame.BorderSizePixel = 2
+mainFrame.Parent = screenGui
+
+-- 3. Create a title for the UI
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Name = "Title"
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.BackgroundColor3 = Color3.fromRGB(55, 55, 65)
+titleLabel.BorderColor3 = Color3.fromRGB(85, 85, 105)
+titleLabel.Text = "ray FEILD ui"
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 18
+titleLabel.Parent = mainFrame
+
+-- 4. Create UI List Layout to auto-organize our items
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 5)
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+listLayout.Parent = mainFrame
+
+--// SECTION: Main
+local mainSectionLabel = Instance.new("TextLabel")
+mainSectionLabel.Name = "MainSection"
+mainSectionLabel.Size = UDim2.new(1, 0, 0, 25)
+mainSectionLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+mainSectionLabel.Text = "--- Main ---"
+mainSectionLabel.Font = Enum.Font.SourceSans
+mainSectionLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+mainSectionLabel.TextSize = 16
+mainSectionLabel.LayoutOrder = 1 -- Set order for the list layout
+mainSectionLabel.Parent = mainFrame
+
+-- Button: Big Head
+local bigHeadButton = Instance.new("TextButton")
+bigHeadButton.Name = "BigHeadButton"
+bigHeadButton.Size = UDim2.new(1, 0, 0, 30)
+bigHeadButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+bigHeadButton.BorderColor3 = Color3.fromRGB(85, 85, 105)
+bigHeadButton.Text = "Big Head"
+bigHeadButton.Font = Enum.Font.SourceSansBold
+bigHeadButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+bigHeadButton.TextSize = 16
+bigHeadButton.LayoutOrder = 2
+bigHeadButton.Parent = mainFrame
+
+-- Button: Speed
+local speedButton = Instance.new("TextButton")
+speedButton.Name = "SpeedButton"
+speedButton.Size = UDim2.new(1, 0, 0, 30)
+speedButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+speedButton.BorderColor3 = Color3.fromRGB(85, 85, 105)
+speedButton.Text = "Speed (50)"
+speedButton.Font = Enum.Font.SourceSansBold
+speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedButton.TextSize = 16
+speedButton.LayoutOrder = 3
+speedButton.Parent = mainFrame
+
+--// SECTION: Settings
+local settingsSectionLabel = Instance.new("TextLabel")
+settingsSectionLabel.Name = "SettingsSection"
+settingsSectionLabel.Size = UDim2.new(1, 0, 0, 25)
+settingsSectionLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+settingsSectionLabel.Text = "--- Settings ---"
+settingsSectionLabel.Font = Enum.Font.SourceSans
+settingsSectionLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+settingsSectionLabel.TextSize = 16
+settingsSectionLabel.LayoutOrder = 4
+settingsSectionLabel.Parent = mainFrame
+
+-- Button: Low Graphics
+local lowGfxButton = Instance.new("TextButton")
+lowGfxButton.Name = "LowGfxButton"
+lowGfxButton.Size = UDim2.new(1, 0, 0, 30)
+lowGfxButton.BackgroundColor3 = Color3.fromRGB(60, 60, 75)
+lowGfxButton.BorderColor3 = Color3.fromRGB(85, 85, 105)
+lowGfxButton.Text = "Low Graphics"
+lowGfxButton.Font = Enum.Font.SourceSansBold
+lowGfxButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+lowGfxButton.TextSize = 16
+lowGfxButton.LayoutOrder = 5
+lowGfxButton.Parent = mainFrame
+
+
+--// FUNCTIONALITY
+-- This part of the script connects the buttons to functions.
+
+-- Function to make the player's head big
+bigHeadButton.MouseButton1Click:Connect(function()
+    if head then
+        -- We multiply the original size to prevent it from growing infinitely
+        head.Size = originalHeadSize * 2.5
+        print("Big Head activated.")
+    end
+end)
+
+-- Function to make the player faster
+speedButton.MouseButton1Click:Connect(function()
+    if humanoid then
+        humanoid.WalkSpeed = 50
+        print("Speed set to 50.")
+    end
+end)
+
+-- Function to lower graphics settings and reduce lag
+lowGfxButton.MouseButton1Click:Connect(function()
+    -- Set graphics quality to the lowest level
+    UserSettings.GameSettings.SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+    
+    -- Turn off shadows for performance
+    Lighting.GlobalShadows = false
+    
+    -- Set lighting technology to a less demanding option
+    Lighting.Technology = Enum.Technology.Compatibility
+    
+    print("Low Graphics settings applied.")
+    lowGfxButton.Text = "Low GFX (Applied)"
+    lowGfxButton.BackgroundColor3 = Color3.fromRGB(80, 120, 80) -- Change color to show it's active
+end)
